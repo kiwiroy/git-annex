@@ -22,7 +22,7 @@ import qualified Data.Map as M
 import Data.Char
 import Network.Socket (HostName)
 import Network.HTTP.Conduit (Manager, newManager, closeManager)
-import Network.HTTP.Client (defaultManagerSettings, managerResponseTimeout, responseStatus, responseBody, RequestBody(..))
+import Network.HTTP.Client (defaultManagerSettings, managerResponseTimeout, responseStatus, responseBody, managerSetProxy, proxyEnvironment, RequestBody(..))
 import Network.HTTP.Types
 import Control.Monad.Trans.Resource
 import Control.Monad.Catch
@@ -399,7 +399,9 @@ withS3Handle c u info a = do
 		a $ S3Handle mgr awscfg s3cfg info
   where
 	s3cfg = s3Configuration c
-	httpcfg = defaultManagerSettings
+	httpcfg = managerSetProxy
+            	(proxyEnvironment Nothing)
+            	defaultManagerSettings
 		{ managerResponseTimeout = Nothing }
 	nocreds = error "Cannot use S3 without credentials configured"
 
